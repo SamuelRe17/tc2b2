@@ -1,1 +1,8 @@
+# Programación Reactiva
+
+La programación reactiva se enfoca en 2 conceptos claves, estos son:
+
+* Asincronía: Es cuando se adapta a situaciones en las que los eventos ocurren de forma no lineal o en tiempo real.
+
+* Flujo de Datos: En lugar de manejar datos de forma secuencial, como en la programación estructurada, la programación reactiva se centra en flujos continuos de datos.
 
