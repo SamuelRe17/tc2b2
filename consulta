@@ -33,3 +33,21 @@ Como "Desventajas" contamos con:
 * Complejidad: En algunos casos, la programación reactiva puede introducir una complejidad adicional en el diseño y la implementación del sistema, especialmente para aplicaciones más simples o menos asincrónicas.
 * Consumo de Recursos: Dependiendo de cómo se implemente, la programación reactiva puede requerir un mayor consumo de recursos.
 * Sobreingeniería: Existe el riesgo de caer en la sobreingeniería al adoptar la programación reactiva en situaciones donde no proporciona beneficios significativos o adecuados para los requisitos del proyecto.
+
+## Frameworks Reactivos
+
+Los frameworks reactivos son conjuntos de herramientas, bibliotecas y patrones que facilitan el desarrollo de sistemas que responden de manera eficiente y resiliente a eventos y cambios en el entorno. Las aplicaciones que requieren interacción en tiempo real, como juegos, sistemas de chat y aplicaciones de transmisión en vivo, se benefician de los patrones y abstracciones ofrecidos por los frameworks reactivos. Entre los frameworks reactivos tenemos como la más popular a:
+
+* RxJava: Como mencioné anteriormente, RxJava es una extensión de ReactiveX para el lenguaje Java. Proporciona constructores como Observable y Observer para trabajar con flujos de datos y una amplia variedad de operadores para manipular estos flujos.
+
+## Operadores
+
+Los operadores son funciones que permiten transformar, combinar, filtrar y manipular flujos de datos de diversas maneras. Estos operadores facilitan la creación de flujos de datos más complejos y ayudan a manejar el flujo de eventos de manera eficiente. Entre ellos contamos con:
+
+* Operadores de creación: create(), just(), fromArray().
+* Operadores de transformación: map(), flatmap(), switchmap()
+* Operadores de filtrado: filter(), take(), distinct()
+* Operadores de combinación: merge(), concat(), zip()
+* Operadores de error: catchError()
+* Operadores de utilidad: suscribe(), delay(), timeout()
+
