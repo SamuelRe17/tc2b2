@@ -1,90 +1,34 @@
-import scala.collection.mutable.ListBuffer
-import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future, Promise}
+// Definición básica de Observable
+class Observable[T](private val elements: List[T]) {
+  def subscribe(onNext: T => Unit): Unit = {
+    elements.foreach(onNext)
+  }
 
-// Define una clase básica Observable
-class Observable[T](producer: Observer[T] => Unit) {
-
-  def subscribe(observer: Observer[T]): Unit = producer(observer)
-
+  // Operador: map
   def map[R](f: T => R): Observable[R] = {
-    new Observable[R](observer => subscribe(new Observer[T] {
-      override def onNext(value: T): Unit = observer.onNext(f(value))
-      override def onError(error: Throwable): Unit = observer.onError(error)
-      override def onComplete(): Unit = observer.onComplete()
-    }))
+    new Observable[R](elements.map(f))
   }
 
+  // Operador: filter
   def filter(predicate: T => Boolean): Observable[T] = {
-    new Observable[T](observer => subscribe(new Observer[T] {
-      override def onNext(value: T): Unit = if (predicate(value)) observer.onNext(value)
-      override def onError(error: Throwable): Unit = observer.onError(error)
-      override def onComplete(): Unit = observer.onComplete()
-    }))
+    new Observable[T](elements.filter(predicate))
   }
 
-  // Implementa más operadores aquí, como flatMap, switchMap, merge, concat, zip, etc.
-
-  // Operador de utilidad: delay
-  def delay(duration: Duration)(implicit ec: ExecutionContext): Observable[T] = {
-    new Observable[T](observer => {
-      Future {
-        Thread.sleep(duration.toMillis)
-        subscribe(observer)
-      }
-    })
+  // Operador: merge (simplificado)
+  def merge(another: Observable[T]): Observable[T] = {
+    new Observable[T](elements ++ another.elements)
   }
-}
-
-// Define una interfaz básica Observer
-trait Observer[T] {
-  def onNext(value: T): Unit
-  def onError(error: Throwable): Unit
-  def onComplete(): Unit
-}
-
-// Crear funciones auxiliares para operadores de creación
-object Observable {
-
-  // Operador de creación: create
-  def create[T](f: Observer[T] => Unit): Observable[T] = new Observable[T](f)
-
-  // Operador de creación: just
-  def just[T](items: T*): Observable[T] = create(observer => {
-    items.foreach(observer.onNext)
-    observer.onComplete()
-  })
-
-  // Operador de creación: fromArray
-  def fromArray[T](array: Array[T]): Observable[T] = create(observer => {
-    array.foreach(observer.onNext)
-    observer.onComplete()
-  })
 }
 
 // Ejemplo de uso básico
-object ReactiveFrameworkExample extends App {
 
-  implicit val ec: ExecutionContext = ExecutionContext.global
+  val source1 = new Observable[Int](List(1, 2, 3))
+  val source2 = new Observable[Int](List(4, 5, 6))
 
-  // Usando operadores de creación
-  val source = Observable.just(1, 2, 3, 4, 5)
+  // Usar operadores
+  val mapped = source1.map(_ * 2)
+  val filtered = mapped.filter(_ % 4 == 0)
+  val merged = filtered.merge(source2)
 
-  // Usando operadores de transformación
-  val transformed = source.map(_ * 2)
-
-  // Usando operadores de filtrado
-  val filtered = transformed.filter(_ % 4 == 0)
-
-  // Usando operadores de utilidad
-  val delayed = filtered.delay(2.seconds)
-
-  // Suscribir y observar
-  delayed.subscribe(new Observer[Int] {
-    override def onNext(value: Int): Unit = println(s"Received value: $value")
-    override def onError(error: Throwable): Unit = println(s"Received error: $error")
-    override def onComplete(): Unit = println("Completed")
-  })
-
-  Thread.sleep(5000)  // Esperar para que se completen las operaciones
-}
+  // Suscribirse y observar
+  merged.subscribe(println)
