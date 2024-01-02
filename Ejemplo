@@ -1,31 +1,35 @@
-import scala.concurrent.{Await, Future}
-import scala.concurrent.duration._
-import scala.concurrent.ExecutionContext.Implicits.global
+// Definición básica de Observable
+class Observable[T](private val elements: List[T]) {
+  def subscribe(onNext: T => Unit): Unit = {
+    elements.foreach(onNext)
+  }
 
+  // Operador: map
+  def map[R](f: T => R): Observable[R] = {
+    new Observable[R](elements.map(f))
+  }
 
+  // Operador: filter
+  def filter(predicate: T => Boolean): Observable[T] = {
+    new Observable[T](elements.filter(predicate))
+  }
 
-  // 1. Operador de Creación: Crear un Future con una lista
-  val futureSource = Future.successful(1 to 5)
+  // Operador: merge (simplificado)
+  def merge(another: Observable[T]): Observable[T] = {
+    new Observable[T](elements ++ another.elements)
+  }
+}
 
-  // 2. Operador de Transformación: Transformar cada elemento por 2 usando map
-  val transformed = futureSource.map(_.map(_ * 2))
+// Ejemplo de uso básico
 
-  // 3. Operador de Filtrado: Filtrar números pares usando filter
-  val filtered = transformed.map(_.filter(_ % 2 == 0))
+  val source1 = new Observable[Int](List(1, 2, 3))
+  val source2 = new Observable[Int](List(4, 5, 6))
 
-  // 4. Operador de Combinación: Combinar dos flujos (en este caso, será el mismo)
-  val combined = for {
-    initial <- filtered
-    mergedResult = initial ++ initial // Simplemente combinamos el mismo resultado
-  } yield mergedResult
+  // Usar operadores
+  val mapped = source1.map(_ * 2)
+  val filtered = mapped.filter(_ % 4 == 0)
+  val merged = filtered.merge(source2)
 
-  // 5. Operador de Error: (No se está tratando un manejo explícito de errores en este ejemplo)
-  // Si deseas manejar errores, puedes usar try-catch o Future combinado con recover, fallbackTo, etc.
-
-  // 6. Operador de Utilidad: Retrasar emisión de elementos usando un bloque Await
-  val delayedResult = Await.result(combined, 2.seconds)
-
-  // Observar los resultados
-  println(delayedResult)
-
+  // Suscribirse y observar
+  merged.subscribe(println)
 
