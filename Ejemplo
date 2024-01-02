@@ -1,1 +1,31 @@
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
+
+
+
+  // 1. Operador de Creación: Crear un Future con una lista
+  val futureSource = Future.successful(1 to 5)
+
+  // 2. Operador de Transformación: Transformar cada elemento por 2 usando map
+  val transformed = futureSource.map(_.map(_ * 2))
+
+  // 3. Operador de Filtrado: Filtrar números pares usando filter
+  val filtered = transformed.map(_.filter(_ % 2 == 0))
+
+  // 4. Operador de Combinación: Combinar dos flujos (en este caso, será el mismo)
+  val combined = for {
+    initial <- filtered
+    mergedResult = initial ++ initial // Simplemente combinamos el mismo resultado
+  } yield mergedResult
+
+  // 5. Operador de Error: (No se está tratando un manejo explícito de errores en este ejemplo)
+  // Si deseas manejar errores, puedes usar try-catch o Future combinado con recover, fallbackTo, etc.
+
+  // 6. Operador de Utilidad: Retrasar emisión de elementos usando un bloque Await
+  val delayedResult = Await.result(combined, 2.seconds)
+
+  // Observar los resultados
+  println(delayedResult)
+
 
