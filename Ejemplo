@@ -1,51 +1,54 @@
-class Observable[T](private val elements: List[T]) {
-  
-  // Método: Promedio de elementos (esto es solo un ejemplo, para adaptarse a tu estilo)
-  def average(f: T => Int): Double = {
-    val n = elements.length
-    val sum = elements.map(f).sum.toDouble
-    sum / n
-  }
+import rx
+from rx import operators as ops
 
-  // Método: Desviación estándar de elementos (esto es solo un ejemplo, para adaptarse a tu estilo)
-  def standardDeviation(f: T => Int): Double = {
-    val n = elements.length
-    val avg = average(f)
-    math.sqrt(elements.map(f).map(x => math.pow(x - avg, 2)).sum / (n - 1))
-  }
+numbers1 = [1, 2, 3, 4, 5]
+numbers2 = [9, 8, 7]
 
-  // Operador: map
-  def map[R](f: T => R): Observable[R] = {
-    val transformedElements = elements.map(f)
-    new Observable[R](transformedElements)
-  }
+# Observable 1: from_iterable
+observable1 = rx.from_iterable(numbers1)
 
-  // Operador: filter
-  def filter(predicate: T => Boolean): Observable[T] = {
-    val filteredElements = elements.filter(predicate)
-    new Observable[T](filteredElements)
-  }
+# Operador 1: filter
+filtered_observable1 = observable1.pipe(ops.filter(lambda value: value % 2 == 0))
 
-  // Operador: merge (simplificado)
-  def merge(another: Observable[T]): Observable[T] = {
-    val mergedElements = elements ++ another.elements
-    new Observable[T](mergedElements)
-  }
+# Suscripción 1
+def on_next(value):
+    print("Observable 1:", value)
 
-  // Método para suscribirse (solo un ejemplo para adaptarse a tu estilo)
-  def display(f: T => String): Unit = {
-    elements.map(f).foreach(println)
-  }
-}
+filtered_observable1.subscribe(on_next)
 
-// Ejemplo de uso básico basado en tu estilo
-val source1 = new Observable[Int](List(1, 2, 3))
-val source2 = new Observable[Int](List(4, 5, 6))
+# Operador 2: map
+observable1 = observable1.pipe(ops.map(lambda value: value * 2))
 
-// Usar operadores
-val mapped = source1.map(_ * 2)
-val filtered = mapped.filter(_ % 4 == 0)
-val merged = filtered.merge(source2)
+# Suscripción 2
+def on_next(value):
+    print("Observable 1 (map):", value)
 
-// Suscribirse y mostrar
-merged.display(_.toString)
+observable1.subscribe(on_next)
+
+# Observable 2: from_iterable
+observable2 = rx.from_iterable(numbers2)
+
+# Operador 3: merge
+observable_merged = rx.merge(observable1, observable2).pipe(
+    ops.filter(lambda value: value % 2 == 0)
+)
+
+# Suscripción 3
+def on_next(value):
+    print("Merged Observable:", value)
+
+observable_merged.subscribe(on_next)
+
+# Observable 3: concat
+observable1 = rx.from_iterable(numbers1)
+observable2 = rx.from_iterable(numbers2)
+
+observable_concat = rx.concat(observable1, observable2).pipe(
+    ops.filter(lambda value: value % 2 == 0)
+)
+
+# Suscripción 4
+def on_next(value):
+    print("Concatenated Observable:", value)
+
+observable_concat.subscribe(on_next)
